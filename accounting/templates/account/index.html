@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Accounting</h1>
+<div class="container">
+    <div class="row mx-auto mt-3">
+        <form class="d-flex">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Filter</button>
+        </form>
+    </div>
+    <div class="row mx-auto mt-3">
+        <div class="col">
+            <table class="table table-sm table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Payer</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Cost</th>
+                        <th scope="col">Comment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for spend in object_list %}
+                    <tr>
+                        <th scope="row">{{ spend.id }}</th>
+                        <td><a href="{% url 'account:payer_list' spend.payer_id %}">{{ spend.payer }}</a></td>
+                        <td><a href="{% url 'account:category_list' spend.category_id %}">{{ spend.category }}</a></td>
+                        <td>{{ spend.cost }}</td>
+                        <td>{{ spend.comment }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th>Total:</th>
+                        <th>{{ sum }}</th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="col">
+            2 of 2
+        </div>
+    </div>
+    <div class="row mx-auto mt-3">
+        <table class="table table-sm table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Payer</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Cost</th>
+                    <th scope="col">Comment</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for spend in object_list %}
+                <tr>
+                    <th scope="row">{{ spend.id }}</th>
+                    <td>{{ spend.payer }}</td>
+                    <td>{{ spend.category }}</td>
+                    <td>{{ spend.cost }}</td>
+                    <td>{{ spend.comment }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>Total:</th>
+                    <th>{{ sum }}</th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+{% endblock %}

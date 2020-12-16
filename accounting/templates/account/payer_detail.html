@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <table class="table table-sm table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Payer</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Cost</th>
+                        <th scope="col">Comment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for spend in object_list %}
+                    <tr>
+                        <th scope="row">{{ spend.id }}</th>
+                        <td>{{ spend.payer }}</td>
+                        <td>{{ spend.category }}</td>
+                        <td>{{ spend.cost }}</td>
+                        <td>{{ spend.comment }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th>Total:</th>
+                        <th>{{ sum }}</th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
