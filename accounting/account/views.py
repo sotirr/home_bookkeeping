@@ -6,6 +6,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from .models import Spends
 from .forms import SpendForm, CategoryForm
+from .filters import CostDateFilter
 
 
 class Index(PermissionRequiredMixin, ListView):
@@ -13,12 +14,36 @@ class Index(PermissionRequiredMixin, ListView):
     template_name = 'account/index.html'
     permission_required = 'account.view_spends'
 
+    def get_queryset(self):
+        queryset = Spends.objects.all()
+        self.filtered_list = CostDateFilter(self.request.GET, queryset=queryset)
+        return self.filtered_list.qs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['sum'] = self.model.objects.aggregate(Sum('cost'))['cost__sum']
+        context['filtered_data'] = self.filtered_list
+        context['sum'] = self.filtered_list.qs.aggregate(Sum('cost'))['cost__sum']
         return context
 
 
+class PayerView(ListView):
+    model = Spends
+    template_name = 'account/index.html'
+
+    def get_queryset(self):
+        payer_id = self.kwargs['payer_id']
+        queryset = Spends.objects.filter(payer=payer_id)
+        self.filtered_list = CostDateFilter(self.request.GET, queryset=queryset)
+        return self.filtered_list.qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filtered_data'] = self.filtered_list
+        context['sum'] = self.filtered_list.qs.aggregate(Sum('cost'))['cost__sum']
+        return context
+
+
+'''
 class PayerView(View):
     model = Spends
     template_name = 'account/payer_detail.html'
@@ -28,7 +53,7 @@ class PayerView(View):
         context = {'object_list': data}
         return render(request, self.template_name,
                       context=context)
-
+'''
 
 class CategoryView(View):
     model = Spends

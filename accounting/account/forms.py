@@ -8,11 +8,11 @@ from .models import Spends, Categories
 class SpendForm(forms.Form):
     payer = forms.ModelChoiceField(
         queryset=Spends.payer.get_queryset().filter(groups__name='Payers'),
-        widget=forms.Select(attrs={'class': 'form-control'})
+        widget=forms.Select(attrs={'class': 'form-select'})
     )
     category = forms.ModelChoiceField(
         queryset=Categories.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control'}),
+        widget=forms.Select(attrs={'class': 'form-select'}),
     )
     comment = forms.CharField(
         max_length=50, required=False,
@@ -23,7 +23,7 @@ class SpendForm(forms.Form):
     )
     cost_date = forms.DateField(
         initial=timezone.now(),
-        widget=forms.DateInput(attrs={'class': 'form-control'}),
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
     )
 
     def clean_cost_date(self):
@@ -61,7 +61,3 @@ class CategoryForm(forms.Form):
     def save(self):
         new_category = Categories.objects.create(**self.cleaned_data)
         return new_category
-
-
-class DateFilterForm(forms.Form):
-    pass

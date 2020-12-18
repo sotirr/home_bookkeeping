@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'django_filters',
     'social_django',
     'accounts.apps.AccountsConfig',
     'account.apps.AccountConfig',

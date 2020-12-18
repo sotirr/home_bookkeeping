@@ -18,6 +18,9 @@ class Spends(models.Model):
     def __str__(self):
         return f'{self.payer}, {self.category}, {self.cost}, {self.comment}'
 
+    class Meta:
+        ordering = ['-cost_date']
+
 
 class Payers(models.Model):
     name = models.CharField("Name", max_length=50)
