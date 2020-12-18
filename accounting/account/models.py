@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.urls import reverse
 
 
 class Spends(models.Model):
@@ -13,7 +14,7 @@ class Spends(models.Model):
     input_date = models.DateTimeField(auto_now_add=True)
 
     def get_absolute_url(self):
-        return '/account/'
+        return reverse('account:index')
 
     def __str__(self):
         return f'{self.payer}, {self.category}, {self.cost}, {self.comment}'
@@ -22,26 +23,11 @@ class Spends(models.Model):
         ordering = ['-cost_date']
 
 
-class Payers(models.Model):
-    name = models.CharField("Name", max_length=50)
-
-    def __str__(self):
-        return self.name
-
-
 class Categories(models.Model):
     category_name = models.CharField("Category", max_length=50)
 
     def get_absolute_url(self):
-        return '/account/'
+        return reverse('account:index')
 
     def __str__(self):
         return self.category_name
-
-
-class Subcategory(models.Model):
-    category = models.ForeignKey("Categories", on_delete=models.CASCADE)
-    subcategory_name = models.CharField("Subcategory", max_length=50)
-
-    def __str__(self):
-        return self.subcategory_name
