@@ -13,7 +13,7 @@ class TestCategoriesModel(TestCase):
         )
 
     def test_category_creation(self):
-        self.assertEqual(str(self.category), 'Test_category')
+        self.assertEqual(str(self.category), self.category.category_name)
 
     def test_category_get_absolute_url(self):
         absolute_url = self.category.get_absolute_url()
@@ -29,7 +29,10 @@ class TestSpendsModel(TestCase):
         user_model = get_user_model()
         payer = user_model.objects.create(username='test_payer')
         self.spend = Spends.objects.create(
-            payer=payer, category=category, cost=10.1, cost_date=timezone.now(),
+            payer=payer,
+            category=category,
+            cost=10.1,
+            cost_date=timezone.now(),
         )
 
     def test_spend_creation(self):
