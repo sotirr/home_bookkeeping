@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import (
     UserCreationForm, AuthenticationForm, SetPasswordForm
 )
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
@@ -45,7 +45,9 @@ class CustomUserCreationForm(UserCreationForm):
 
     class META(UserCreationForm.Meta):
         model = User
-        fields = UserCreationForm.Meta.fields + ('first_name', 'last_name', 'email',)
+        fields = UserCreationForm.Meta.fields + ('first_name',
+                                                 'last_name',
+                                                 'email',)
 
     def clean_email(self):
         email = self.cleaned_data['email'].lower()
@@ -63,6 +65,9 @@ class CustomUserCreationForm(UserCreationForm):
 
         if commit:
             user.save()
+            payer_group = Group.objects.get(name='Payers')
+            user.groups.add(payer_group)
+
         return user
 
 

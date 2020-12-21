@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
-from django.views.generic import ListView, DetailView, FormView, View
+from django.views.generic import ListView, View
 from django.db.models import Sum
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
@@ -15,8 +15,8 @@ class Index(PermissionRequiredMixin, ListView):
     permission_required = 'account.view_spends'
 
     def get_queryset(self):
-        queryset = Spends.objects.all()
-        self.filtered_list = CostDateFilter(self.request.GET, queryset=queryset)
+        qs = self.model.objects.all()
+        self.filtered_list = CostDateFilter(self.request.GET, queryset=qs)
         return self.filtered_list.qs
 
     def get_context_data(self, **kwargs):
@@ -24,46 +24,6 @@ class Index(PermissionRequiredMixin, ListView):
         context['filtered_data'] = self.filtered_list
         context['sum'] = self.filtered_list.qs.aggregate(Sum('cost'))['cost__sum']
         return context
-
-
-class PayerView(ListView):
-    model = Spends
-    template_name = 'account/index.html'
-
-    def get_queryset(self):
-        payer_id = self.kwargs['payer_id']
-        queryset = Spends.objects.filter(payer=payer_id)
-        self.filtered_list = CostDateFilter(self.request.GET, queryset=queryset)
-        return self.filtered_list.qs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['filtered_data'] = self.filtered_list
-        context['sum'] = self.filtered_list.qs.aggregate(Sum('cost'))['cost__sum']
-        return context
-
-
-'''
-class PayerView(View):
-    model = Spends
-    template_name = 'account/payer_detail.html'
-
-    def get(self, request, payer_id):
-        data = self.model.objects.filter(payer=payer_id)
-        context = {'object_list': data}
-        return render(request, self.template_name,
-                      context=context)
-'''
-
-class CategoryView(View):
-    model = Spends
-    template_name = 'account/payer_detail.html'
-
-    def get(self, request, category_id):
-        data = self.model.objects.filter(category=category_id)
-        context = {'object_list': data}
-        return render(request, self.template_name,
-                      context=context)
 
 
 class CreateSpend(PermissionRequiredMixin, View):

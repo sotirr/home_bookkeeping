@@ -1,5 +1,7 @@
 from django import forms
 from django.utils import timezone
+from django.contrib.auth import get_user_model
+from django.db.models import Q
 from django.core.exceptions import ValidationError
 
 from .models import Spends, Categories
@@ -7,7 +9,10 @@ from .models import Spends, Categories
 
 class SpendForm(forms.Form):
     payer = forms.ModelChoiceField(
-        queryset=Spends.payer.get_queryset().filter(groups__name='Payers'),
+        queryset=get_user_model().objects.filter(
+            Q(groups__permissions__codename='add_spends') |
+            Q(user_permissions__codename='add_spends')
+        ),
         widget=forms.Select(attrs={'class': 'form-select'})
     )
     category = forms.ModelChoiceField(
