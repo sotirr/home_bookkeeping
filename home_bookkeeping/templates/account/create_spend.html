@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Create spend{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="mx-auto w-50 p-5">
+        <h2>Create a new spend</h2>
+        <form action="{% url 'account:create_spend' %}" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Submit" class="btn btn-dark">
+        </form>
+    </div>
+</div>
+{% endblock %}
