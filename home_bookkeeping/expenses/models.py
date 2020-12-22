@@ -14,7 +14,7 @@ class Spends(models.Model):
     input_date = models.DateTimeField(auto_now_add=True)
 
     def get_absolute_url(self):
-        return reverse('account:index')
+        return reverse('expenses:index')
 
     def __str__(self):
         return f'{self.payer}, {self.category}, {self.cost}, {self.comment}'
@@ -27,7 +27,7 @@ class Categories(models.Model):
     category_name = models.CharField("Category", max_length=50)
 
     def get_absolute_url(self):
-        return reverse('account:index')
+        return reverse('expenses:index')
 
     def __str__(self):
         return self.category_name

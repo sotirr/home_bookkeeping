@@ -11,8 +11,8 @@ from .filters import CostDateFilter
 
 class Index(PermissionRequiredMixin, ListView):
     model = Spends
-    template_name = 'account/index.html'
-    permission_required = 'account.view_spends'
+    template_name = 'expenses/index.html'
+    permission_required = 'expenses.view_spends'
 
     def get_queryset(self):
         qs = self.model.objects.all()
@@ -27,11 +27,11 @@ class Index(PermissionRequiredMixin, ListView):
 
 
 class CreateSpend(PermissionRequiredMixin, View):
-    permission_required = 'account.add_spends'
+    permission_required = 'expenses.add_spends'
 
     def get(self, request):
         form = SpendForm()
-        return render(request, 'account/create_spend.html',
+        return render(request, 'expenses/create_spend.html',
                       context={'form': form})
 
     def post(self, request):
@@ -40,16 +40,16 @@ class CreateSpend(PermissionRequiredMixin, View):
             new_spend = bound_form.save()
             return redirect(new_spend)
         else:
-            return render(request, 'account/create_spend.html',
+            return render(request, 'expenses/create_spend.html',
                           context={'form': bound_form})
 
 
 class CreateCategory(PermissionRequiredMixin, View):
-    permission_required: str = 'account.add_categories'
+    permission_required: str = 'expenses.add_categories'
 
     def get(self, request: HttpRequest) -> HttpResponse:
         form = CategoryForm()
-        return render(request, 'account/create_category.html',
+        return render(request, 'expenses/create_category.html',
                       context={'form': form})
 
     def post(self, request: HttpRequest) -> HttpResponse:
@@ -58,5 +58,5 @@ class CreateCategory(PermissionRequiredMixin, View):
             new_category = bound_form.save()
             return redirect(new_category)
         else:
-            return render(request, 'account/create_category.html',
+            return render(request, 'expenses/create_category.html',
                           context={'form': bound_form})

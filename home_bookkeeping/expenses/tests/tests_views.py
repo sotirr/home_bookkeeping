@@ -6,9 +6,9 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.utils import timezone
 
-from account.forms import CategoryForm, SpendForm
-from account.models import Categories, Spends
-from account.filters import CostDateFilter
+from expenses.forms import CategoryForm, SpendForm
+from expenses.models import Categories, Spends
+from expenses.filters import CostDateFilter
 
 
 class TestsPermission(ABC):
@@ -86,7 +86,7 @@ class TestsViewsContainForm(TestsPermission, ABC):
         )
         resp = self.client.post(reverse(self.test_url), self.right_form)
         self.assertRedirects(
-            resp, reverse('account:index'),
+            resp, reverse('expenses:index'),
             status_code=302, target_status_code=403,
             msg_prefix='', fetch_redirect_response=True,
         )
@@ -114,25 +114,26 @@ class TestsViewsContainForm(TestsPermission, ABC):
 
 
 class TestCreateCategory(TestsViewsContainForm, TestCase):
-    test_url = 'account:create_category'
+    test_url = 'expenses:create_category'
     test_form = CategoryForm
-    test_template = 'account/create_category.html'
+    test_template = 'expenses/create_category.html'
     permission = 'add_categories'
     filled_form = {'category_name': 'test_category'}
 
 
 class TestCreateSpend(TestsViewsContainForm, TestCase):
-    test_url = 'account:create_spend'
+    test_url = 'expenses:create_spend'
     test_form = SpendForm
-    test_template = 'account/create_spend.html'
+    test_template = 'expenses/create_spend.html'
     permission = 'add_spends'
 
     @property
     def filled_form(cls):
+        user = get_user_model().objects.get(username='user_with_permission')
         category = Categories.objects.create(category_name='test_category')
         category.save()
         right_form = {
-            'payer': '1',
+            'payer': user.id,
             'category': category.id,
             'cost': 123,
             'cost_date': '2020-12-19'
@@ -141,20 +142,18 @@ class TestCreateSpend(TestsViewsContainForm, TestCase):
 
 
 class TestIndex(TestsPermission, TestCase):
-    test_url = 'account:index'
-    test_template = 'account/index.html'
+    test_url = 'expenses:index'
+    test_template = 'expenses/index.html'
     permission = 'view_spends'
     form = CostDateFilter
 
     def setUp(self):
         super().setUp()
-
-        spend1 = Spends(
-            payer_id=1, cost=1.1, cost_date=timezone.now(), comment='spend1'
-        )
-        spend2 = Spends(
-            payer_id=1, cost=2.2, cost_date=timezone.now(), comment='spend2'
-        )
+        user = get_user_model().objects.get(username='user_with_permission')
+        spend1 = Spends(payer_id=user.id, cost=1.1,
+                        cost_date=timezone.now(), comment='spend1')
+        spend2 = Spends(payer_id=user.id, cost=2.2,
+                        cost_date=timezone.now(), comment='spend2')
         spend1.save()
         spend2.save()
 
@@ -179,7 +178,7 @@ class TestIndex(TestsPermission, TestCase):
             username='user_with_permission', password='test_password',
         )
         resp = self.client.get(reverse(self.test_url))
-        self.assertEqual(resp.context['sum'], 3.3000000000000003)
+        self.assertEqual(resp.context['sum'], 3.3)
 
     def test_get_receive_queryset(self):
 

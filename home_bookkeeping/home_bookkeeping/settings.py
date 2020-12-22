@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     'django_filters',
     'social_django',
     'accounts.apps.AccountsConfig',
-    'account.apps.AccountConfig',
+    'expenses.apps.ExpensesConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -89,8 +89,8 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
+    'accounts.pipeline.save_to_group',
 )
-
 
 WSGI_APPLICATION = 'home_bookkeeping.wsgi.application'
 
@@ -100,11 +100,14 @@ WSGI_APPLICATION = 'home_bookkeeping.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'home_bookkeeping', 
+        'USER': 'django_user', 
+        'PASSWORD': 'password',
+        'HOST': '127.0.0.1', 
+        'PORT': '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -146,7 +149,7 @@ STATIC_URL = '/static/'
 
 
 # login actions
-LOGIN_REDIRECT_URL = '/account/'
+LOGIN_REDIRECT_URL = '/expenses/'
 LOGOUT_REDIRECT_URL = 'login'
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get("GOOGLE_OAUTH2_KEY")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ.get("GOOGLE_OAUTH2_SECRET")

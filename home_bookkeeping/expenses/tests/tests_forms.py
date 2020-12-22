@@ -5,8 +5,8 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 
-from account.forms import CategoryForm, SpendForm
-from account.models import Categories, Spends
+from expenses.forms import CategoryForm, SpendForm
+from expenses.models import Categories, Spends
 
 
 class TestSpendForm(TestCase):
@@ -45,10 +45,11 @@ class TestSpendForm(TestCase):
 
     def test_save_functional(self):
         self.create_users()
+        user = get_user_model().objects.get(username='user_with_permission')
         category = Categories.objects.create(category_name='test_category')
         category.save()
         bound_form = SpendForm(dict(
-            payer='1',
+            payer=user.id,
             category=category.id,
             cost=123,
             cost_date='2020-12-19',

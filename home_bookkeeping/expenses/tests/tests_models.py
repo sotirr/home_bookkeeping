@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 
-from account.models import Spends, Categories
+from expenses.models import Spends, Categories
 
 
 class TestCategoriesModel(TestCase):
@@ -17,7 +17,7 @@ class TestCategoriesModel(TestCase):
 
     def test_category_get_absolute_url(self):
         absolute_url = self.category.get_absolute_url()
-        self.assertEqual(absolute_url, '/account/')
+        self.assertEqual(absolute_url, '/expenses/')
 
 
 class TestSpendsModel(TestCase):
@@ -43,4 +43,4 @@ class TestSpendsModel(TestCase):
 
     def test_spend_get_absolute_url(self):
         absolute_url = self.spend.get_absolute_url()
-        self.assertEqual(absolute_url, '/account/')
+        self.assertEqual(absolute_url, '/expenses/')
