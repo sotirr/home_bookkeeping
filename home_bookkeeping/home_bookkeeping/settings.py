@@ -16,15 +16,14 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '3#e!m2r0bnieoqnz-7sig(914@k0c*tint!h#(&e$)@eoa(7o0'
+SECRET_KEY = 1234
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -161,3 +160,9 @@ EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'support@homebookkeeping.com'
+
+# HERE STARTS DYNACONF EXTENSION LOAD (Keep at the very bottom of settings.py)
+# Read more at https://dynaconf.readthedocs.io/en/latest/guides/django.html
+import dynaconf  # noqa
+settings = dynaconf.DjangoDynaconf(__name__)  # noqa
+# HERE ENDS DYNACONF EXTENSION LOAD (No more code below this line)
