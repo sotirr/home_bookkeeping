@@ -1,0 +1,1 @@
+web: gunicorn home_bookkeeping.home_bookkeeping.wsgi --log-file -
