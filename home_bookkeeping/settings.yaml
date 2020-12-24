@@ -32,6 +32,6 @@ heroku:
   ALLOWED_HOSTS:
     - 127.0.0.1
     - localhost
-    - https://homebookkeeping.herokuapp.com/
+    - homebookkeeping.herokuapp.com
   CSRF_COOKIE_SECURE: True
   SESSION_COOKIE_SECURE: True
