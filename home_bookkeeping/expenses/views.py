@@ -39,9 +39,9 @@ class CreateSpend(PermissionRequiredMixin, View):
         if bound_form.is_valid():
             new_spend = bound_form.save()
             return redirect(new_spend)
-        else:
-            return render(request, 'expenses/create_spend.html',
-                          context={'form': bound_form})
+
+        return render(request, 'expenses/create_spend.html',
+                      context={'form': bound_form})
 
 
 class CreateCategory(PermissionRequiredMixin, View):
@@ -57,6 +57,6 @@ class CreateCategory(PermissionRequiredMixin, View):
         if bound_form.is_valid():
             new_category = bound_form.save()
             return redirect(new_category)
-        else:
-            return render(request, 'expenses/create_category.html',
-                          context={'form': bound_form})
+
+        return render(request, 'expenses/create_category.html',
+                      context={'form': bound_form})

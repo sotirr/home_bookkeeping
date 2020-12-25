@@ -128,7 +128,7 @@ class TestCreateSpend(TestsViewsContainForm, TestCase):
     permission = 'add_spends'
 
     @property
-    def filled_form(cls):
+    def filled_form(self):
         user = get_user_model().objects.get(username='user_with_permission')
         category = Categories.objects.create(category_name='test_category')
         category.save()

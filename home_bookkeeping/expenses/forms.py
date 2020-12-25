@@ -41,8 +41,7 @@ class SpendForm(forms.Form):
         clean_cost = self.cleaned_data['cost']
         if clean_cost < 0:
             raise ValidationError('cost must be a positive number')
-        else:
-            return clean_cost
+        return clean_cost
 
     def save(self):
         new_spend = Spends.objects.create(**self.cleaned_data)
@@ -60,8 +59,7 @@ class CategoryForm(forms.Form):
         duplicate_names = Categories.objects.filter(category_name=clean_name)
         if duplicate_names.count():
             raise ValidationError('This category has already exist')
-        else:
-            return clean_name
+        return clean_name
 
     def save(self):
         new_category = Categories.objects.create(**self.cleaned_data)
