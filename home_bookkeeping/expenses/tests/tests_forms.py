@@ -34,7 +34,6 @@ class TestSpendForm(TestCase):
     def test_clean_cost_positive_value(self):
         form = SpendForm({'cost': 10})
         self.assertIsNone(form.errors.get('cost'))
-        SpendForm
 
     def test_payer_get_right_queriset(self):
         self.create_users()
