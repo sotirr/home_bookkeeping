@@ -17,6 +17,7 @@ jobs:
       - name: Generate coverage report
         run: |
           pip install coverage
+          pip install -r requirements.txt
           coverage run home_bookkeeping/manage.py test
           coverage xml
       - name: Upload coverage to Codecov
