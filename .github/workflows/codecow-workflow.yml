@@ -34,9 +34,9 @@ jobs:
           pip install -r requirements.txt
       - name: Generate coverage report
         env:
-          ENV_FOR_DYNACONF: github
+          ENV_FOR_DYNACONF: 'github'
           DJANGO_SECRET_KEY: 123
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/github_actions
+          DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/github_actions'
         run: |
           cd home_bookkeeping
           coverage run manage.py test
