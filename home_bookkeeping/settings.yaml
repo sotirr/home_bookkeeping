@@ -35,3 +35,14 @@ heroku:
     - homebookkeeping.herokuapp.com
   CSRF_COOKIE_SECURE: True
   SESSION_COOKIE_SECURE: True
+
+github:
+  DEBUG: True
+  DATABASES:
+    default:
+      ENGINE: django.db.backends.postgresql_psycopg2
+      NAME: github_actions
+      USER: postgres
+      PASSWORD: postgres
+      HOST: localhost
+      PORT: 5432
