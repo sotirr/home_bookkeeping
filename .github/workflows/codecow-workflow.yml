@@ -41,7 +41,6 @@ jobs:
           python manage.py migrate
       - name: Generate coverage report
         run: |
-          cd home_bookkeeping
           coverage run manage.py test
           coverage xml
       - name: Upload coverage to Codecov
