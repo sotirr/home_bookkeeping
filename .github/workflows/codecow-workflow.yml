@@ -2,6 +2,7 @@ name: Python Master Workflow
 on:
   pull_request:
     branches:
+      - 'main'
       - 'develop'
 jobs:
   codecov:
