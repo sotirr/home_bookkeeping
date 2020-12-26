@@ -13,6 +13,8 @@ from expenses.filters import CostDateFilter
 
 class TestsPermission(ABC):
     test_url = None
+    args = None
+    kwargs = None
     permission = None
 
     def setUp(self):
@@ -32,9 +34,11 @@ class TestsPermission(ABC):
         user_with_permission.save()
         user_without_permission.save()
 
+        self.url = reverse(self.test_url, args=self.args, kwargs=self.kwargs)
+
     def test_get_without_user(self):
-        resp = self.client.get(reverse(self.test_url))
-        expected_url = f'{reverse("login")}?next={reverse(self.test_url)}'
+        resp = self.client.get(self.url)
+        expected_url = f'{reverse("login")}?next={self.url}'
         self.assertRedirects(
             resp, expected_url,
             status_code=302, target_status_code=200,
@@ -44,19 +48,18 @@ class TestsPermission(ABC):
         self.client.login(
             username='user_without_permission', password='test_password',
         )
-        resp = self.client.get(reverse(self.test_url))
+        resp = self.client.get(self.url)
         self.assertEqual(resp.status_code, 403)
 
     def test_get_with_right_permission(self):
         self.client.login(
             username='user_with_permission', password='test_password',
         )
-        resp = self.client.get(reverse(self.test_url))
+        resp = self.client.get(self.url)
         self.assertEqual(resp.status_code, 200)
 
 
 class TestsViewsContainForm(TestsPermission, ABC):
-    test_url = None
     test_form = None
     test_template = None
     filled_form = None
@@ -69,22 +72,22 @@ class TestsViewsContainForm(TestsPermission, ABC):
         self.client.login(
             username='user_with_permission', password='test_password',
         )
-        resp = self.client.get(reverse(self.test_url))
-        form = resp.context['form']
+        resp = self.client.get(self.url)
+        form = resp.context.get('form')
         self.assertIsInstance(form, self.test_form)
 
     def test_uses_correct_template(self):
         self.client.login(
             username='user_with_permission', password='test_password',
         )
-        resp = self.client.get(reverse(self.test_url))
+        resp = self.client.get(self.url)
         self.assertTemplateUsed(resp, self.test_template)
 
     def test_post_right_filled_form_redirect(self):
         self.client.login(
             username='user_with_permission', password='test_password',
         )
-        resp = self.client.post(reverse(self.test_url), self.right_form)
+        resp = self.client.post(self.url, self.right_form)
         self.assertRedirects(
             resp, reverse('expenses:index'),
             status_code=302, target_status_code=403,
@@ -95,21 +98,21 @@ class TestsViewsContainForm(TestsPermission, ABC):
         self.client.login(
             username='user_with_permission', password='test_password',
         )
-        resp = self.client.post(reverse(self.test_url), {})
+        resp = self.client.post(self.url, {})
         self.assertEquals(resp.status_code, 200)
 
     def test_post_wrong_form_uses_right_template(self):
         self.client.login(
             username='user_with_permission', password='test_password',
         )
-        resp = self.client.post(reverse(self.test_url), {})
+        resp = self.client.post(self.url, {})
         self.assertTemplateUsed(resp, self.test_template)
 
     def test_post_wrong_form_return_error(self):
         self.client.login(
             username='user_with_permission', password='test_password',
         )
-        resp = self.client.post(reverse(self.test_url), {})
+        resp = self.client.post(self.url, {})
         self.assertContains(resp, 'This field is required.', html=True)
 
 
@@ -202,3 +205,85 @@ class TestIndex(TestsPermission, TestCase):
 
         self.assertQuerysetEqual(receive_queryset, expected_queryset,
                                  transform=lambda x: x)
+
+
+class TestDeleteSpendView(TestsPermission, TestCase):
+    test_url = 'expenses:delete_spend'
+    permission = 'delete_spends'
+    test_template = 'expenses/delete_spend.html'
+
+    @property
+    def kwargs(self):
+        user = get_user_model().objects.get(
+            username='user_with_permission'
+        )
+        user2 = get_user_model().objects.get(
+            username='user_without_permission'
+        )
+        spend1 = Spends(payer_id=user.id, cost=1,
+                        cost_date=timezone.now(), comment='spend1')
+        self.spend2 = Spends(payer_id=user2.id, cost=1,
+                             cost_date=timezone.now(), comment='spend2')
+        spend1.save()
+        self.spend2.save()
+        return {'pk': spend1.pk}
+
+    def test_uses_correct_template(self):
+        self.client.login(
+            username='user_with_permission', password='test_password',
+        )
+        resp = self.client.get(self.url)
+        self.assertTemplateUsed(resp, self.test_template)
+
+    def test_post_right_redirect(self):
+        self.client.login(
+            username='user_with_permission', password='test_password',
+        )
+        resp = self.client.post(self.url)
+        self.assertRedirects(
+            resp, reverse('expenses:index'),
+            status_code=302, target_status_code=403,
+            msg_prefix='', fetch_redirect_response=True,
+        )
+
+    def test_get_attempt_delete_not_own_spend_status_code(self):
+        self.client.login(
+            username='user_with_permission', password='test_password',
+        )
+        resp = self.client.get(
+            reverse(self.test_url, kwargs={'pk': self.spend2.pk})
+        )
+        self.assertEqual(resp.status_code, 403)
+
+    def test_post_attempt_delete_not_own_spend_status_code(self):
+        self.client.login(
+            username='user_with_permission', password='test_password',
+        )
+        resp = self.client.post(
+            reverse(self.test_url, kwargs={'pk': self.spend2.pk})
+        )
+        self.assertEqual(resp.status_code, 403)
+
+    def test_get_attempt_delete_not_own_spend_msg(self):
+        self.client.login(
+            username='user_with_permission', password='test_password',
+        )
+        resp = self.client.get(
+            reverse(self.test_url, kwargs={'pk': self.spend2.pk})
+        )
+        self.assertContains(
+            resp, '<h1>You can delete only own spends<h1>',
+            html=True, status_code=403,
+        )
+
+    def test_post_attempt_delete_not_own_spend_msg(self):
+        self.client.login(
+            username='user_with_permission', password='test_password',
+        )
+        resp = self.client.post(
+            reverse(self.test_url, kwargs={'pk': self.spend2.pk})
+        )
+        self.assertContains(
+            resp, '<h1>You can delete only own spends<h1>',
+            html=True, status_code=403,
+        )

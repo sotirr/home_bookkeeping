@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete spend{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="mx-auto w-50 p-5">
+        <h2>Are you sure you want to delete this record?</h2>
+        <form method="post">
+            {% csrf_token %}
+            <a href="{% url 'expenses:index' %}" class="btn btn-dark">No</a>
+            <input type="submit" value="Yes" class="btn btn-dark">
+        </form>
+    </div>
+</div>
+{% endblock %}
