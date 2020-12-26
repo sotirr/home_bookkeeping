@@ -38,7 +38,7 @@ jobs:
           DJANGO_SECRET_KEY: 123
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/github_actions
         run: |
-          tree
+          ls
           python3 manage.py migrate
       - name: Generate coverage report
         run: |
