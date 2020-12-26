@@ -29,7 +29,7 @@ jobs:
           python-version: 3.9
       - name: Set up requrements
         run: |
-          python -m pip install --upgrade pip
+          python3 -m pip install --upgrade pip
           pip install coverage
           pip install -r requirements.txt
       - name: Run migrations
@@ -38,7 +38,7 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/github_actions
         run: |
           cd home_bookkeeping
-          python manage.py migrate
+          python3 manage.py migrate
       - name: Generate coverage report
         run: |
           coverage run manage.py test
