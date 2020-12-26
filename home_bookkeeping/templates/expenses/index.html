@@ -28,6 +28,7 @@
                     <th scope="col">Cost</th>
                     <th scope="col">Comment</th>
                     <th scope="col">cost_date</th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
@@ -39,6 +40,7 @@
                     <td>{{ spend.cost }}</td>
                     <td>{{ spend.comment }}</td>
                     <td>{{ spend.cost_date }}</td>
+                    <td style="width: 1%"><a href="{% url 'expenses:delete_spend' spend.id %}" class="btn-close">-</a></td>
                 </tr>
                 {% endfor %}
             </tbody>

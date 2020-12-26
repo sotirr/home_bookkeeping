@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
-from django.views.generic import ListView, View
+from django.views.generic import ListView, View, DeleteView
 from django.db.models import Sum
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.urls import reverse_lazy
+from django.http import HttpResponseForbidden
+from django.views.defaults import permission_denied
 
 from .models import Spends
 from .forms import SpendForm, CategoryForm
@@ -10,9 +13,10 @@ from .filters import CostDateFilter
 
 
 class Index(PermissionRequiredMixin, ListView):
+    permission_required = 'expenses.view_spends'
+
     model = Spends
     template_name = 'expenses/index.html'
-    permission_required = 'expenses.view_spends'
 
     def get_queryset(self):
         qs = self.model.objects.all()
@@ -60,3 +64,29 @@ class CreateCategory(PermissionRequiredMixin, View):
 
         return render(request, 'expenses/create_category.html',
                       context={'form': bound_form})
+
+
+class DeleteSpend(PermissionRequiredMixin, DeleteView):
+    permission_required: str = 'expenses.delete_spends'
+
+    model = Spends
+    success_url = reverse_lazy('expenses:index')
+    template_name = 'expenses/delete_spend.html'
+
+    def get(self, request, *args, **kwargs):
+        current_spend = self.get_object()
+        if self.request.user != current_spend.payer:
+            return permission_denied(
+                request, 403,
+                template_name='custom_errors/403_when_del_spend.html',
+            )
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        current_spend = self.get_object()
+        if self.request.user != current_spend.payer:
+            return permission_denied(
+                request, 403,
+                template_name='custom_errors/403_when_del_spend.html',
+            )
+        return super().post(request, *args, **kwargs)
