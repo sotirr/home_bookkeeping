@@ -273,7 +273,7 @@ class TestDeleteSpendView(TestsPermission, TestCase):
         )
         self.assertContains(
             resp, '<h2>You can delete only own spends<h2>',
-            html=True, status_code=403,
+            html=False, status_code=403,
         )
 
     def test_post_attempt_delete_not_own_spend_msg(self):
@@ -285,5 +285,5 @@ class TestDeleteSpendView(TestsPermission, TestCase):
         )
         self.assertContains(
             resp, '<h2>You can delete only own spends<h2>',
-            html=True, status_code=403,
+            html=False, status_code=403,
         )

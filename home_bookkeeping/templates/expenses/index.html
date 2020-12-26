@@ -34,7 +34,7 @@
             <tbody>
                 {% for spend in object_list %}
                 <tr>
-                    <th scope="row">{{ spend.id }}</th>
+                    <th scope="row">{{ forloop.counter }}</th>
                     <td>{{ spend.payer }}</td>
                     <td>{{ spend.category }}</td>
                     <td>{{ spend.cost }}</td>
