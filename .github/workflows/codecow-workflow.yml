@@ -44,5 +44,5 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
+          file: home_bookkeeping/coverage.xml
           flags: unittests
