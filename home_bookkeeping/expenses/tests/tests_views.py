@@ -272,7 +272,7 @@ class TestDeleteSpendView(TestsPermission, TestCase):
             reverse(self.test_url, kwargs={'pk': self.spend2.pk})
         )
         self.assertContains(
-            resp, '<h1>You can delete only own spends<h1>',
+            resp, '<h2>You can delete only own spends<h2>',
             html=True, status_code=403,
         )
 
@@ -284,6 +284,6 @@ class TestDeleteSpendView(TestsPermission, TestCase):
             reverse(self.test_url, kwargs={'pk': self.spend2.pk})
         )
         self.assertContains(
-            resp, '<h1>You can delete only own spends<h1>',
+            resp, '<h2>You can delete only own spends<h2>',
             html=True, status_code=403,
         )

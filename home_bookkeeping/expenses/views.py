@@ -5,6 +5,7 @@ from django.db.models import Sum
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.http import HttpResponseForbidden
+from django.views.defaults import permission_denied
 
 from .models import Spends
 from .forms import SpendForm, CategoryForm
@@ -75,15 +76,17 @@ class DeleteSpend(PermissionRequiredMixin, DeleteView):
     def get(self, request, *args, **kwargs):
         current_spend = self.get_object()
         if self.request.user != current_spend.payer:
-            return HttpResponseForbidden(
-                '<h1>You can delete only own spends<h1>'
+            return permission_denied(
+                request, 403,
+                template_name='custom_errors/403_when_del_spend.html',
             )
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         current_spend = self.get_object()
         if self.request.user != current_spend.payer:
-            return HttpResponseForbidden(
-                '<h1>You can delete only own spends<h1>'
+            return permission_denied(
+                request, 403,
+                template_name='custom_errors/403_when_del_spend.html',
             )
         return super().post(request, *args, **kwargs)
