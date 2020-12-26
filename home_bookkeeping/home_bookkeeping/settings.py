@@ -145,5 +145,8 @@ django_heroku.settings(locals())
 # HERE STARTS DYNACONF EXTENSION LOAD (Keep at the very bottom of settings.py)
 # Read more at https://dynaconf.readthedocs.io/en/latest/guides/django.html
 import dynaconf  # noqa
-settings = dynaconf.DjangoDynaconf(__name__)  # noqa
+settings = dynaconf.DjangoDynaconf(
+    __name__,
+    PRELOAD_FOR_DYNACONF=["../settings.yaml", "../.secrets.yaml"]
+)
 # HERE ENDS DYNACONF EXTENSION LOAD (No more code below this line)
