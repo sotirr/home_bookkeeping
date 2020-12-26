@@ -1,12 +1,25 @@
 name: Python Master Workflow
 on:
-  push:
+  pull_request:
     branches:
+      - 'main'
       - 'develop'
 jobs:
   codecov:
     name: Codecov Workflow
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:13.1
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: github_actions
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     
     steps:
       - uses: actions/checkout@v1
@@ -14,14 +27,22 @@ jobs:
         uses: actions/setup-python@master
         with:
           python-version: 3.8
-      - name: Generate coverage report
+      - name: Set up requrements
         run: |
+          python3 -m pip install --upgrade pip
           pip install coverage
+          pip install -r requirements.txt
+      - name: Generate coverage report
+        env:
+          ENV_FOR_DYNACONF: 'github'
+          DJANGO_SECRET_KEY: 123
+        run: |
+          cd home_bookkeeping
           coverage run manage.py test
           coverage xml
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
+          file: home_bookkeeping/coverage.xml
           flags: unittests

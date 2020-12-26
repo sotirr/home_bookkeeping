@@ -128,7 +128,7 @@ class TestCreateSpend(TestsViewsContainForm, TestCase):
     permission = 'add_spends'
 
     @property
-    def filled_form(cls):
+    def filled_form(self):
         user = get_user_model().objects.get(username='user_with_permission')
         category = Categories.objects.create(category_name='test_category')
         category.save()
@@ -150,9 +150,9 @@ class TestIndex(TestsPermission, TestCase):
     def setUp(self):
         super().setUp()
         user = get_user_model().objects.get(username='user_with_permission')
-        spend1 = Spends(payer_id=user.id, cost=1.1,
+        spend1 = Spends(payer_id=user.id, cost=1,
                         cost_date=timezone.now(), comment='spend1')
-        spend2 = Spends(payer_id=user.id, cost=2.2,
+        spend2 = Spends(payer_id=user.id, cost=2,
                         cost_date=timezone.now(), comment='spend2')
         spend1.save()
         spend2.save()
@@ -178,7 +178,7 @@ class TestIndex(TestsPermission, TestCase):
             username='user_with_permission', password='test_password',
         )
         resp = self.client.get(reverse(self.test_url))
-        self.assertEqual(resp.context['sum'], 3.3)
+        self.assertEqual(resp.context['sum'], 3)
 
     def test_get_receive_queryset(self):
 

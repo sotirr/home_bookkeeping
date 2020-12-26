@@ -52,10 +52,11 @@ class CustomUserCreationForm(UserCreationForm):
     def clean_email(self):
         email = self.cleaned_data['email'].lower()
         duplicate_emails = User.objects.filter(email=email)
+
         if duplicate_emails.count():
             raise ValidationError('Such email is already used')
-        else:
-            return email
+
+        return email
 
     def save(self, commit=True):
         user = super().save(commit=False)
