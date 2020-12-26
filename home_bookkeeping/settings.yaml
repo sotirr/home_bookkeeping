@@ -37,7 +37,6 @@ heroku:
   SESSION_COOKIE_SECURE: True
 
 github:
-  development:
   DEBUG: True
   DATABASES:
     default:
