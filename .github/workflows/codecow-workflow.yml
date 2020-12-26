@@ -35,6 +35,7 @@ jobs:
       - name: Generate coverage report
         env:
           DJANGO_SECRET_KEY: 123
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/github_actions
         run: |
           cd home_bookkeeping
           coverage run manage.py test
