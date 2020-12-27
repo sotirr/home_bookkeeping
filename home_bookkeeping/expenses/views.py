@@ -15,7 +15,7 @@ class Index(PermissionRequiredMixin, ListView):
     permission_required = 'expenses.view_spends'
 
     model = Spends
-    paginate_by = 3
+    paginate_by = 20
     template_name = 'expenses/index.html'
 
     def get_queryset(self):
