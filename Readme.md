@@ -13,7 +13,7 @@ This site helps to keep home bookkeeping
 First clone the repository from Github and switch to the new directory:
 
 ```bash
-$ git clone git@github.com/USERNAME/{{ project_name }}.git
+$ git clone git@github.com/sotirr/home_bookkeeping.git
 $ cd home_bookkeeping
 ```
 

@@ -34,7 +34,7 @@
             <tbody>
                 {% for spend in object_list %}
                 <tr>
-                    <th scope="row">{{ spend.id }}</th>
+                    <th scope="row">{{ forloop.counter0|add:page_obj.start_index }}</th>
                     <td>{{ spend.payer }}</td>
                     <td>{{ spend.category }}</td>
                     <td>{{ spend.cost }}</td>
@@ -54,6 +54,39 @@
                 </tr>
             </tfoot>
         </table>
+    </div>
+</div>
+<div class="container">
+    <div class="row mx-auto">
+        <div class="col-md-12">
+        {% if is_paginated %}
+
+            {% if page_obj.has_previous %}
+                <a class="btn btn-outline-dark mb-4" href="?page=1&{{ saved_params }}">First</a>
+                <a class="btn btn-outline-dark mb-4" href="?page={{ page_obj.previous_page_number }}&{{ saved_params }}">Previous</a>
+            {% else %}
+                <a class="btn btn-outline-dark mb-4 disabled" href=#">First</a>
+                <a class="btn btn-outline-dark mb-4 disabled" href=#">Previous</a>
+            {% endif %}
+        
+            {% for num in page_obj.paginator.page_range %}
+              {% if page_obj.number == num %}
+                <a class="btn success mb-4" href="?page={{ num }}&{{ saved_params }}">{{ num }}</a>
+              {% elif num >= page_obj.number|add:'-1' and num <= page_obj.number|add:'1' %}
+                <a class="btn btn-outline-dark mb-4" href="?page={{ num }}&{{ saved_params }}">{{ num }}</a>
+              {% endif %}
+            {% endfor %}
+        
+            {% if page_obj.has_next %}
+                <a class="btn btn-outline-dark mb-4" href="?page={{ page_obj.next_page_number }}&{{ saved_params }}">Next</a>
+                <a class="btn btn-outline-dark mb-4" href="?page={{ page_obj.paginator.num_pages }}&{{ saved_params }}">Last</a>
+            {% else %}
+                <a class="btn btn-outline-dark mb-4 disabled" href=#">Next</a>
+                <a class="btn btn-outline-dark mb-4 disabled" href=#">Last</a>
+            {% endif %}
+        
+        {% endif %}
+        </div>   
     </div>
 </div>
 {% endblock %}

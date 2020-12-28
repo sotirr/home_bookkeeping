@@ -4,7 +4,6 @@ from django.views.generic import ListView, View, DeleteView
 from django.db.models import Sum
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse_lazy
-from django.http import HttpResponseForbidden
 from django.views.defaults import permission_denied
 
 from .models import Spends
@@ -16,6 +15,7 @@ class Index(PermissionRequiredMixin, ListView):
     permission_required = 'expenses.view_spends'
 
     model = Spends
+    paginate_by = 20
     template_name = 'expenses/index.html'
 
     def get_queryset(self):
@@ -26,8 +26,18 @@ class Index(PermissionRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['filtered_data'] = self.filtered_list
-        context['sum'] = self.filtered_list.qs.aggregate(Sum('cost'))['cost__sum']
+        context['sum'] = self._count_sum()
+        context['saved_params'] = self._save_get_params()
         return context
+
+    def _save_get_params(self) -> str:
+        get_copy = self.request.GET.copy()
+        if get_copy.get('page'):
+            get_copy.pop('page')
+        return get_copy.urlencode()
+
+    def _count_sum(self) -> int:
+        return self.filtered_list.qs.aggregate(Sum('cost'))['cost__sum']
 
 
 class CreateSpend(PermissionRequiredMixin, View):
