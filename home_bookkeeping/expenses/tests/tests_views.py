@@ -183,6 +183,14 @@ class TestIndex(TestsPermission, TestCase):
         resp = self.client.get(reverse(self.test_url))
         self.assertEqual(resp.context['sum'], 3)
 
+    def test_get_receive_urlencode_context(self):
+        self.client.login(
+            username='user_with_permission', password='test_password',
+        )
+        params = {'comment': 'spend1', 'page': '1'}
+        resp = self.client.get(reverse(self.test_url), params)
+        self.assertEqual(resp.context.get('saved_params'), 'comment=spend1')
+
     def test_get_receive_queryset(self):
 
         self.client.login(
@@ -273,7 +281,7 @@ class TestDeleteSpendView(TestsPermission, TestCase):
         )
         self.assertContains(
             resp, '<h2>You can delete only own spends<h2>',
-            html=True, status_code=403,
+            html=False, status_code=403,
         )
 
     def test_post_attempt_delete_not_own_spend_msg(self):
@@ -285,5 +293,5 @@ class TestDeleteSpendView(TestsPermission, TestCase):
         )
         self.assertContains(
             resp, '<h2>You can delete only own spends<h2>',
-            html=True, status_code=403,
+            html=False, status_code=403,
         )
