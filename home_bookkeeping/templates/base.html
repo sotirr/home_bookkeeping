@@ -27,6 +27,9 @@
                 <li class="nav-item">
                   <a class="nav-link " href="{% url 'expenses:create_category' %}">Add category</a>
                 </li>
+                <li class="nav-item">
+                  <a class="nav-link " href="{% url 'expenses:dashboard' %}">Dashboard</a>
+                </li>
               </ul>
               <span class="navbar-text">
                 Hi, {{ user.username|default:'Guest' }}!
