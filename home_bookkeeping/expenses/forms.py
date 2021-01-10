@@ -8,6 +8,9 @@ from .models import Spends, Categories
 
 
 class SpendForm(forms.Form):
+    '''
+    Form for create a spend record
+    '''
     payer = forms.ModelChoiceField(
         queryset=get_user_model().objects.filter(
             Q(groups__permissions__codename='add_spends') |
@@ -32,29 +35,44 @@ class SpendForm(forms.Form):
     )
 
     def clean_cost_date(self):
+        '''
+        validates data field
+        '''
         date = self.cleaned_data['cost_date']
         if date > timezone.now().date():
             raise ValidationError("Data cannot be in the future")
         return date
 
     def clean_cost(self):
+        '''
+        validates cost field
+        '''
         clean_cost = self.cleaned_data['cost']
         if clean_cost < 0:
             raise ValidationError('cost must be a positive number')
         return clean_cost
 
     def save(self):
+        '''
+        Records to db
+        '''
         new_spend = Spends.objects.create(**self.cleaned_data)
         return new_spend
 
 
 class CategoryForm(forms.Form):
+    '''
+    Form for create a new category
+    '''
     category_name = forms.CharField(
         max_length=50,
         widget=forms.TextInput(attrs={'class': 'form-control'}),
     )
 
     def clean_category_name(self):
+        '''
+        validates category_name field
+        '''
         clean_name = self.cleaned_data['category_name']
         duplicate_names = Categories.objects.filter(category_name=clean_name)
         if duplicate_names.count():
@@ -62,5 +80,8 @@ class CategoryForm(forms.Form):
         return clean_name
 
     def save(self):
+        '''
+        Records to db
+        '''
         new_category = Categories.objects.create(**self.cleaned_data)
         return new_category
