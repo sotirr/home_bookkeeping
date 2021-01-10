@@ -5,17 +5,22 @@ from django.db.models import Sum
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.views.defaults import permission_denied
+from django.db.models import F
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 from .models import Spends
 from .forms import SpendForm, CategoryForm
 from .filters import CostDateFilter
+from .serializers import SpendsGroupedSerializer
 
 
 class Index(PermissionRequiredMixin, ListView):
     permission_required = 'expenses.view_spends'
 
     model = Spends
-    paginate_by = 20
+    paginate_by = 10
     template_name = 'expenses/index.html'
 
     def get_queryset(self):
@@ -38,6 +43,13 @@ class Index(PermissionRequiredMixin, ListView):
 
     def _count_sum(self) -> int:
         return self.filtered_list.qs.aggregate(Sum('cost'))['cost__sum']
+
+
+class DashboardView(PermissionRequiredMixin, View):
+    permission_required = 'expenses.view_spends'
+
+    def get(self, request):
+        return render(request, 'expenses/dashboard.html')
 
 
 class CreateSpend(PermissionRequiredMixin, View):
@@ -100,3 +112,66 @@ class DeleteSpend(PermissionRequiredMixin, DeleteView):
                 template_name='custom_errors/403_when_del_spend.html',
             )
         return super().post(request, *args, **kwargs)
+
+
+class ApiChartMixin():
+    '''
+    Mixin charts
+    '''
+    model = None
+    serializer = None
+    filterset = None
+
+    chart_label: str = None
+    chart_field: str = None
+
+    def get(self, request):
+        queryset = self.get_queryset(request=request)
+        serialized = self.serializer(queryset, many=True)
+        data = self.pars_for_graphjs(serialized.data)
+        return Response(data)
+
+    def get_queryset(self, request):
+        base_qs = self.model.objects.all()
+        filtered_list = self.filterset(self.request.GET, queryset=base_qs)
+        queryset = (filtered_list.qs.values(name=F(self.chart_field))
+                                    .annotate(total=Sum('cost'))
+                                    .order_by())
+        return queryset
+
+    def pars_for_graphjs(self, serialized_data):
+        labels = []
+        data = []
+        for row in serialized_data:
+            labels.append(row['name'])
+            data.append(row['total'])
+        parsed_data = {
+            "labels": labels,
+            "chartLabel": self.chart_label,
+            "data": data,
+        }
+        return parsed_data
+
+
+class ApiCategoriesChart(ApiChartMixin, APIView):
+    '''
+    Data for categories charts
+    '''
+    model = Spends
+    serializer = SpendsGroupedSerializer
+    filterset = CostDateFilter
+
+    chart_label = 'Categories'
+    chart_field = 'category__category_name'
+
+
+class ApiPayersChart(ApiChartMixin, APIView):
+    '''
+    Data for payers charts
+    '''
+    model = Spends
+    serializer = SpendsGroupedSerializer
+    filterset = CostDateFilter
+
+    chart_label = 'Payers'
+    chart_field = 'payer__username'

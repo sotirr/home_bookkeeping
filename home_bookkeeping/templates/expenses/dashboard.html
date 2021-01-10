@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h1>Dashboard</h1>
+
+<div class="container">
+    <div class="row mx-auto mt-3">
+        <div class="col" style="width: 30%;"> 
+            <canvas id="payersChartPie"></canvas> 
+        </div>
+        <div class="col" width> 
+            <canvas id="text" width="550" height="500"></canvas> 
+        </div> 
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<script>
+    var endpoint = "{% url 'expenses:payers_chart_data' %}?{{ saved_params }}";
+        
+    $.ajax({
+        method: "GET",
+        url: endpoint,
+        success: function(data) { 
+            drawPieGraph(data, 'payersChartPie'); 
+            drawText(data, 'text');
+            console.log("drawing"); 
+        }, 
+        error: function(error_data) { 
+            console.log(error_data); 
+        }
+    }) 
+
+    function drawPieGraph(data, id) {
+        var ctx = document.getElementById(id).getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.data,
+                        backgroundColor: [
+                            'rgba(0, 0, 0, 0.2)',
+                            'rgba(0, 0, 0, 0.4)',
+                            'rgba(0, 0, 0, 0.6)',
+                            'rgba(0, 0, 0, 0.8)',
+                        ],
+                    }]          
+                },
+                options: {
+                    responsive: true,
+                    legend: {
+                        display: true,
+                    },
+                    title: {
+                        display: true,
+                        text: data.chartLabel
+                    },
+                }
+            });
+        }
+    
+    function drawText(data, id) {
+        var ctx = document.getElementById('text').getContext('2d');
+        ctx.font = '24px serif';
+        var width = 0;
+        var height = 50;
+        var lineHeight = 30;
+        for (var i = 0; i < data.labels.length; i++) {
+            text = data.labels[i] + " has spent " + data.data[i] + " rubles";
+            ctx.fillText(text, width, height);
+            height += lineHeight
+        }
+
+        var totalSum;
+        totalSum = data.data.reduce((a, b) => a + b);
+        text = 'Total spends: ' + totalSum + " rubles";
+        height += lineHeight;
+        ctx.fillText(text, width, height);
+        height += lineHeight + 15;
+        for (var i = 0; i < data.labels.length; i++) {
+            if (data.data[i] < totalSum / data.labels.length) {
+                text = data.labels[i] + "'s debt equals " + (totalSum / data.labels.length - data.data[i]) + " rubles";
+                ctx.fillText(text, width, height);
+                height += lineHeight;
+            }
+        }
+    }
+</script>
+{% endblock %}
