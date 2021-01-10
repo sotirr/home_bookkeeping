@@ -17,6 +17,9 @@ from .serializers import SpendsGroupedSerializer
 
 
 class Index(PermissionRequiredMixin, ListView):
+    '''
+    main view about spend records
+    '''
     permission_required = 'expenses.view_spends'
 
     model = Spends
@@ -24,11 +27,17 @@ class Index(PermissionRequiredMixin, ListView):
     template_name = 'expenses/index.html'
 
     def get_queryset(self):
+        '''
+        gets filtered queryset
+        '''
         qs = self.model.objects.all()
         self.filtered_list = CostDateFilter(self.request.GET, queryset=qs)
         return self.filtered_list.qs
 
     def get_context_data(self, **kwargs):
+        '''
+        override method for adding new data to context
+        '''
         context = super().get_context_data(**kwargs)
         context['filtered_data'] = self.filtered_list
         context['sum'] = self._count_sum()
@@ -36,16 +45,26 @@ class Index(PermissionRequiredMixin, ListView):
         return context
 
     def _save_get_params(self) -> str:
+        '''
+        saves get params for using the filter and the pagination
+        in the same time
+        '''
         get_copy = self.request.GET.copy()
         if get_copy.get('page'):
             get_copy.pop('page')
         return get_copy.urlencode()
 
     def _count_sum(self) -> int:
+        '''
+        counts total spends sum
+        '''
         return self.filtered_list.qs.aggregate(Sum('cost'))['cost__sum']
 
 
 class DashboardView(PermissionRequiredMixin, View):
+    '''
+    View for summary report and Chart.js graphs
+    '''
     permission_required = 'expenses.view_spends'
 
     def get(self, request):
@@ -53,6 +72,9 @@ class DashboardView(PermissionRequiredMixin, View):
 
 
 class CreateSpend(PermissionRequiredMixin, View):
+    '''
+    View for creating a spend record
+    '''
     permission_required = 'expenses.add_spends'
 
     def get(self, request):
@@ -71,6 +93,9 @@ class CreateSpend(PermissionRequiredMixin, View):
 
 
 class CreateCategory(PermissionRequiredMixin, View):
+    '''
+    view for creating a new category
+    '''
     permission_required: str = 'expenses.add_categories'
 
     def get(self, request: HttpRequest) -> HttpResponse:
@@ -89,6 +114,9 @@ class CreateCategory(PermissionRequiredMixin, View):
 
 
 class DeleteSpend(PermissionRequiredMixin, DeleteView):
+    '''
+    View for deleting a spend record with custom a permission denide errors
+    '''
     permission_required: str = 'expenses.delete_spends'
 
     model = Spends
@@ -96,6 +124,10 @@ class DeleteSpend(PermissionRequiredMixin, DeleteView):
     template_name = 'expenses/delete_spend.html'
 
     def get(self, request, *args, **kwargs):
+        '''
+        overrides the get method to add the next validation:
+        only user who created this spend can del the spend
+        '''
         current_spend = self.get_object()
         if self.request.user != current_spend.payer:
             return permission_denied(
@@ -105,6 +137,10 @@ class DeleteSpend(PermissionRequiredMixin, DeleteView):
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        '''
+        overrides the post method to add the next validation:
+        only user who created this spend can del the spend
+        '''
         current_spend = self.get_object()
         if self.request.user != current_spend.payer:
             return permission_denied(
@@ -140,6 +176,9 @@ class ApiChartMixin():
         return queryset
 
     def pars_for_graphjs(self, serialized_data):
+        '''
+        parsing data for using with Chart.js
+        '''
         labels = []
         data = []
         for row in serialized_data:

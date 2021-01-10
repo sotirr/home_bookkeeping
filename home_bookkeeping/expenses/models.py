@@ -4,6 +4,9 @@ from django.urls import reverse
 
 
 class Spends(models.Model):
+    '''
+    Stores a list of spends. Related with Categories.
+    '''
     payer = models.ForeignKey(settings.AUTH_USER_MODEL,
                               on_delete=models.PROTECT)
     category = models.ForeignKey("Categories", null=True,
@@ -24,6 +27,9 @@ class Spends(models.Model):
 
 
 class Categories(models.Model):
+    '''
+    Stores categories
+    '''
     category_name = models.CharField("Category", max_length=50)
 
     def get_absolute_url(self):

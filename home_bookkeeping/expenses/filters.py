@@ -5,6 +5,9 @@ from .models import Spends, Categories
 
 
 class CostDateFilter(django_filters.FilterSet):
+    '''
+    Filtering spend records
+    '''
     start_date = django_filters.DateFilter(
         field_name='cost_date',
         lookup_expr='gte',
