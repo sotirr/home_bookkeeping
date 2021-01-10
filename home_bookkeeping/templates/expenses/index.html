@@ -2,6 +2,7 @@
 
 {% block content %}
 <h1>Expenses</h1>
+
 <div class="container">
     <form class="row mx-auto mt-3">
         <div class="col"></div>
@@ -17,6 +18,173 @@
         <div class="col"></div>
     </form>
 </div>
+
+<div class="container">
+    <div class="row mx-auto mt-3"> 
+        <div class="col" style="width: 30%;"> 
+            <canvas id="categoryChartRadar"></canvas> 
+        </div> 
+        <div class="col" style="width: 30%;"> 
+            <canvas id="categoryChartBar"></canvas> 
+        </div>
+        <div class="col" style="width: 30%;"> 
+            <canvas id="payersChartPie"></canvas> 
+        </div> 
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<script>
+    var endpoint = "{% url 'expenses:categories_chart_data' %}?{{ saved_params }}";
+        
+    $.ajax({
+        method: "GET",
+        url: endpoint,
+        success: function(data) { 
+            drawRadarGraph(data, 'categoryChartRadar');
+            drawBarGraph(data, 'categoryChartBar'); 
+            console.log("drawing"); 
+        }, 
+        error: function(error_data) { 
+            console.log(error_data); 
+        }
+    }) 
+
+    function drawRadarGraph(data, id) {
+        var ctx = document.getElementById(id).getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: data.chartLabel,
+                    data: data.data,
+                    backgroundColor: 'rgba(0, 0, 0, 0.2)'
+                }]          
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    display: false,
+                },
+                title: {
+                    display: true,
+                    text: data.chartLabel
+                },
+                scale: {
+                    ticks: {
+                    beginAtZero: true,
+                    display: false,
+                    }
+                }
+            }
+        });
+    }
+
+    function drawBarGraph(data, id) { 
+        var ctx = document.getElementById(id).getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+               labels: 
+                    data.labels,
+                    datasets: [{
+                        label: data.chartLabel,
+                        data: data.data,
+                        backgroundColor: [
+                            'rgba(0, 0, 0, 0.2)',
+                            'rgba(0, 0, 0, 0.4)',
+                            'rgba(0, 0, 0, 0.6)',
+                            'rgba(0, 0, 0, 0.8)',
+                            'rgba(0, 0, 0, 0.1)',
+                            'rgba(0, 0, 0, 0.3)',
+                            'rgba(0, 0, 0, 0.5)',
+                            'rgba(0, 0, 0, 0.7)',
+                            'rgba(0, 0, 0, 0.9)'
+                        ],
+                    }]          
+                },
+            options: {
+                responsive: true,
+                legend: {
+                    display: false,
+                },
+                title: {
+                    display: true,
+                    text: data.chartLabel
+                },
+                scales: { 
+                    yAxes: [{ 
+                        ticks: { 
+                            beginAtZero: true 
+                        } 
+                    }] 
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                                return tooltipItem.yLabel;
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
+<script>
+    var endpoint = "{% url 'expenses:payers_chart_data' %}?{{ saved_params }}";
+        
+    $.ajax({
+        method: "GET",
+        url: endpoint,
+        success: function(data) { 
+            drawPieGraph(data, 'payersChartPie'); 
+            console.log("drawing"); 
+        }, 
+        error: function(error_data) { 
+            console.log(error_data); 
+        }
+    }) 
+
+    function drawPieGraph(data, id) {
+        var ctx = document.getElementById(id).getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.data,
+                        backgroundColor: [
+                            'rgba(0, 0, 0, 0.2)',
+                            'rgba(0, 0, 0, 0.4)',
+                            'rgba(0, 0, 0, 0.6)',
+                            'rgba(0, 0, 0, 0.8)',
+                        ],
+                    }]          
+                },
+                options: {
+                    responsive: true,
+                    legend: {
+                        display: true,
+                    },
+                    title: {
+                        display: true,
+                        text: data.chartLabel
+                    },
+                }
+            });
+        }
+</script>
+
+
+
+
+
+
+
+
+
+
 <div class="container">
     <div class="row mx-auto mt-3">
         <table class="table table-sm table-striped">
